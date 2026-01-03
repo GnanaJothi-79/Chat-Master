@@ -4,6 +4,7 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -26,15 +27,19 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Upload route
-router.post("/image", upload.single("image"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
-  }
+router.post(
+  "/image",
+  authMiddleware,
+  upload.single("image"),
+  (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
 
-  // Return the public URL to the front-end
-  res.json({
-    imageUrl: `/uploads/${req.file.filename}`,
-  });
-});
+    res.json({
+      imageUrl: `/uploads/${req.file.filename}`,
+    });
+  }
+);
 
 module.exports = router;
