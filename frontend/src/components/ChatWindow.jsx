@@ -61,69 +61,69 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
 
   // Send message (text + optional image)
   // Send message (text + optional image)
-const sendMessage = async () => {
-  if (!text && !selectedImage) return;
+  const sendMessage = async () => {
+    if (!text && !selectedImage) return;
 
-  let imageUrl = null;
+    let imageUrl = null;
 
-  if (selectedImage) {
-    const formData = new FormData();
-    formData.append("image", selectedImage);
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append("image", selectedImage);
 
-    try {
-      const token = localStorage.getItem("token"); // get auth token
+      try {
+        const token = localStorage.getItem("token"); // get auth token
 
-      const res = await axios.post(`${API_URL}/api/upload/image`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`, // send token if required
-        },
-      });
+        const res = await axios.post(`${API_URL}/api/upload/image`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`, // send token if required
+          },
+        });
 
-      // res.data.imageUrl should be like /uploads/filename.png
-      imageUrl = `${API_URL}${res.data.imageUrl}`;
-    } catch (err) {
-      console.error("Image upload failed:", err);
+        // res.data.imageUrl should be like /uploads/filename.png
+        imageUrl = `${API_URL}${res.data.imageUrl}`;
+      } catch (err) {
+        console.error("Image upload failed:", err);
+      }
     }
-  }
 
-  // Prepare message object
-  const msg = {
-    senderId: currentUserId,
-    receiverId: selectedUser._id,
-    message: text || null,
-    image: imageUrl,
-    createdAt: new Date(),
+    // Prepare message object
+    const msg = {
+      senderId: currentUserId,
+      receiverId: selectedUser._id,
+      message: text || null,
+      image: imageUrl,
+      createdAt: new Date(),
+    };
+
+    // Emit message to socket
+    socket.emit("sendMessage", msg);
+
+    // Clear input
+    setText("");
+    setSelectedImage(null);
   };
-
-  // Emit message to socket
-  socket.emit("sendMessage", msg);
-
-  // Clear input
-  setText("");
-  setSelectedImage(null);
-};
 
 
   // Delete a message
   const deleteMessage = async (id) => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    await axios.delete(
-      `${API_URL}/api/messages/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      await axios.delete(
+        `${API_URL}/api/messages/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    setMessages((prev) => prev.filter((m) => m._id !== id));
-  } catch (err) {
-    console.error("Failed to delete message:", err);
-  }
-};
+      setMessages((prev) => prev.filter((m) => m._id !== id));
+    } catch (err) {
+      console.error("Failed to delete message:", err);
+    }
+  };
 
 
   // Group messages by date

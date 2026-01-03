@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose"); 
 const Message = require("../models/Message");
 const authMiddleware = require("../middleware/authMiddleware");
 
@@ -22,19 +23,31 @@ router.get("/:userId", authMiddleware, async (req, res) => {
 // Delete a message
 router.delete("/:msgId", authMiddleware, async (req, res) => {
   try {
-    const msg = await Message.findById(req.params.msgId);
-    if (!msg) return res.status(404).json({ message: "Message not found" });
+    const { msgId } = req.params;
 
+    // ✅ prevent invalid ObjectId crash
+    if (!mongoose.Types.ObjectId.isValid(msgId)) {
+      return res.status(400).json({ message: "Invalid message ID" });
+    }
+
+    const msg = await Message.findById(msgId);
+    if (!msg) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    // ✅ only sender can delete
     if (msg.senderId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Not allowed" });
     }
 
-    await Message.findByIdAndDelete(req.params.msgId);
+    await msg.deleteOne();
 
-    res.json({ message: "Message deleted", msgId: req.params.msgId });
+    res.json({ message: "Message deleted", msgId });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Failed to delete message" });
   }
 });
+
 
 module.exports = router;
