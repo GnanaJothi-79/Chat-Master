@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import socket from "../socket";
 import axios from "axios";
+import socket from "../socket";
 import { Trash2, Send, Image as ImageIcon } from "lucide-react";
 
 const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
@@ -9,39 +9,74 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const messagesEndRef = useRef(null);
 
-  // Auto scroll to bottom
+  // Auto scroll to bottom whenever messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Listen for incoming messages
+  // Clear messages when switching chats
   useEffect(() => {
+    setMessages([]);
+  }, [selectedUser]);
+
+  // Fetch chat history between current user and selected user
+  useEffect(() => {
+    if (!selectedUser) return;
+
+    const fetchMessages = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/messages/${selectedUser._id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setMessages(res.data); // Only messages between currentUser ↔ selectedUser
+      } catch (err) {
+        console.error("Failed to fetch messages:", err);
+      }
+    };
+
+    fetchMessages();
+  }, [selectedUser]);
+
+  // Listen for incoming messages from socket
+  useEffect(() => {
+    if (!selectedUser) return;
+
     const handleMessage = (msg) => {
-      if (
-        msg.senderId === selectedUser._id ||
-        msg.receiverId === selectedUser._id
-      ) {
+      const isCurrentChat =
+        (msg.senderId === currentUserId && msg.receiverId === selectedUser._id) ||
+        (msg.senderId === selectedUser._id && msg.receiverId === currentUserId);
+
+      if (isCurrentChat) {
         setMessages((prev) => [...prev, msg]);
       }
     };
 
     socket.on("receiveMessage", handleMessage);
     return () => socket.off("receiveMessage", handleMessage);
-  }, [selectedUser]);
+  }, [selectedUser, currentUserId]);
 
+  // Send message (text + optional image)
   const sendMessage = async () => {
     if (!text && !selectedImage) return;
 
     let imageUrl = null;
-
     if (selectedImage) {
       const formData = new FormData();
       formData.append("image", selectedImage);
-      const res = await axios.post(
-        "http://localhost:5000/api/upload/image",
-        formData
-      );
-      imageUrl = "http://localhost:5000" + res.data.imageUrl;
+
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/upload/image",
+          formData
+        );
+        imageUrl = "http://localhost:5000" + res.data.imageUrl;
+      } catch (err) {
+        console.error("Image upload failed:", err);
+      }
     }
 
     const msg = {
@@ -58,14 +93,26 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
     setSelectedImage(null);
   };
 
+  // Delete a message
   const deleteMessage = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/messages/${id}`);
-      setMessages((prev) => prev.filter((m) => m._id !== id));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.delete(
+      `http://localhost:5000/api/messages/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setMessages((prev) => prev.filter((m) => m._id !== id));
+  } catch (err) {
+    console.error("Failed to delete message:", err);
+  }
+};
+
 
   // Group messages by date
   const groupedMessages = [];
@@ -83,25 +130,17 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-white relative">
-
       {/* HEADER */}
       <div className="flex items-center gap-3 px-4 py-3 border-b bg-emerald-900">
-        <button
-          onClick={onBack}
-          className="md:hidden text-xl font-bold text-white "
-        >
+        <button onClick={onBack} className="md:hidden text-xl font-bold text-white">
           ←
         </button>
-
         <div className="w-10 h-10 rounded-full bg-emerald-700 text-green-400 flex items-center justify-center font-semibold">
           {initials}
         </div>
-
         <div>
           <p className="font-semibold font-serif text-neutral-50">{selectedUser.username}</p>
-          <p className="text-xs text-neutral-50">
-            {selectedUser.isOnline ? "Online" : "Offline"}
-          </p>
+          <p className="text-xs text-neutral-50">{selectedUser.isOnline ? "Online" : "Offline"}</p>
         </div>
       </div>
 
@@ -161,8 +200,6 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
 
       {/* INPUT BAR */}
       <div className="sticky bottom-0 z-10 bg-green-100 border-t px-2 py-2 flex items-center gap-2 pb-[env(safe-area-inset-bottom)]">
-        
-        {/* Image picker */}
         <label className="cursor-pointer w-11 h-11 rounded-full bg-teal-900 text-white flex items-center justify-center p-2 active:scale-95">
           <ImageIcon size={20} />
           <input
@@ -173,7 +210,6 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
           />
         </label>
 
-        {/* Text input */}
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -181,7 +217,6 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
           className="flex-1 min-w-0 border rounded-full px-4 py-2 outline-none font-serif bg-teal-800 text-neutral-50 focus:ring-2 focus:ring-blue-400"
         />
 
-        {/* Send button */}
         <button
           onClick={sendMessage}
           className="w-11 h-11 rounded-full hover:bg-green-600 bg-teal-800 text-white flex items-center justify-center active:scale-95"
