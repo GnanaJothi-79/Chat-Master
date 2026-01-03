@@ -16,6 +16,7 @@ const ChatList = ({ setSelectedUser }) => {
       try {
         const res = await axios.get(`${API_URL}/api/users`, {
           headers: { Authorization: `Bearer ${token}` },
+           withCredentials: true,
         });
         setUsers(res.data);
       } catch (err) {

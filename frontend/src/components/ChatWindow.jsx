@@ -70,10 +70,10 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
 
       try {
         const res = await axios.post(
-          "http://localhost:5000/api/upload/image",
+          `${API_URL}/api/upload/image`,
           formData
         );
-        imageUrl = "http://localhost:5000" + res.data.imageUrl;
+        imageUrl = API_URL + res.data.imageUrl;
       } catch (err) {
         console.error("Image upload failed:", err);
       }
@@ -99,7 +99,7 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
     const token = localStorage.getItem("token");
 
     await axios.delete(
-      `http://localhost:5000/api/messages/${id}`,
+      `${API_URL}/api/messages/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
