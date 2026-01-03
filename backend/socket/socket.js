@@ -4,7 +4,6 @@ const User = require("../models/User");
 
 const socketHandler = (io) => {
 
-  // 🔐 SOCKET AUTH MIDDLEWARE
   io.use((socket, next) => {
     try {
       const token = socket.handshake.auth?.token;
@@ -23,23 +22,18 @@ const socketHandler = (io) => {
     }
   });
 
-  // 🔌 CONNECTION
   io.on("connection", async (socket) => {
     console.log("✅ User connected:", socket.userId);
 
-    // 🟢 mark online
     await User.findByIdAndUpdate(socket.userId, { isOnline: true });
 
-    // 🏠 join personal room
     socket.join(socket.userId);
 
-    // 📡 notify others
     socket.broadcast.emit("userStatus", {
       userId: socket.userId,
       isOnline: true,
     });
 
-    // 💬 SEND MESSAGE
     socket.on("sendMessage", async ({ receiverId, message, image }) => {
       try {
         if (!receiverId) return;
@@ -51,13 +45,8 @@ const socketHandler = (io) => {
           image: image || null,
           status: "sent",
         });
-
-        // 📤 send to receiver
         io.to(receiverId).emit("receiveMessage", newMessage);
-
-        // 📤 optional: send back to sender (sync)
         io.to(socket.userId).emit("receiveMessage", newMessage);
-
       } catch (err) {
         console.log("❌ Message error:", err.message);
       }
@@ -73,8 +62,6 @@ const socketHandler = (io) => {
       }
     });
 
-
-    // 🔴 DISCONNECT
     socket.on("disconnect", async () => {
       await User.findByIdAndUpdate(socket.userId, { isOnline: false });
 

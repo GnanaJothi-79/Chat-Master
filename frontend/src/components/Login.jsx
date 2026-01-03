@@ -2,7 +2,8 @@ import { useContext, useState } from "react";
 import axios from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { connectSocket } from "../socket"; // make sure you export connectSocket in socket.js
+import { connectSocket } from "../socket";
+
 const API_URL = import.meta.env.VITE_API_URL;
 export default function Login() {
   const { login } = useContext(AuthContext);
@@ -15,20 +16,14 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const res = await axios.post("/api/auth/login", {
         email,
         password,
       });
 
-      // 🔐 store user + token
       login(res.data);
-
-      // 🔌 connect socket
       connectSocket();
-
-      // 🔁 navigate to chat page
       navigate("/chat");
     } catch (err) {
       console.error("Login error:", err.response?.data || err.message);

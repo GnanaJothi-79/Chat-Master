@@ -25,7 +25,6 @@ router.delete("/:msgId", authMiddleware, async (req, res) => {
   try {
     const { msgId } = req.params;
 
-    // ✅ prevent invalid ObjectId crash
     if (!mongoose.Types.ObjectId.isValid(msgId)) {
       return res.status(400).json({ message: "Invalid message ID" });
     }
@@ -35,7 +34,6 @@ router.delete("/:msgId", authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    // ✅ only sender can delete
     if (msg.senderId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Not allowed" });
     }
@@ -48,6 +46,5 @@ router.delete("/:msgId", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Failed to delete message" });
   }
 });
-
 
 module.exports = router;

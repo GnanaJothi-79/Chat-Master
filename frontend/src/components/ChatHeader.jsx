@@ -2,15 +2,14 @@ import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { connectSocket, disconnectSocket } from "../socket";
 
-
 const ChatHeader = ({ showLogout = true }) => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
-    disconnectSocket();   // disconnect socket
-    localStorage.clear(); // clear auth data
-    navigate("/");         // go back to AuthPage
+    disconnectSocket();
+    localStorage.clear();
+    navigate("/");
   };
 
   return (
@@ -24,7 +23,6 @@ const ChatHeader = ({ showLogout = true }) => {
           <p className="text-xs text-green-600">Online</p>
         </div>
       </div>
-
       {showLogout && (
         <button
           onClick={handleLogout}

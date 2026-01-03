@@ -4,7 +4,6 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Get messages between two users
 router.get("/:receiverId", authMiddleware, async (req, res) => {
   const messages = await Message.find({
     $or: [

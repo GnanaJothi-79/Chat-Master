@@ -7,8 +7,8 @@ const Logout = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();                 // clear auth state
-    navigate("/", { replace: true }); // go to AuthPage
+    logout();                 
+    navigate("/", { replace: true }); 
   };
 
   return (

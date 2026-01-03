@@ -16,17 +16,14 @@ const socketHandler = require("./socket/socket");
 const app = express();
 const server = http.createServer(app);
 
-/* ===================== CONFIG ===================== */
 const PORT = process.env.PORT || 5000;
 
-// Allow multiple frontends
 const CLIENT_URLS = [
   "http://localhost:5173",
   "https://chat-master-six.vercel.app",
   "https://chat-master-git-main-gnana-jothis-projects.vercel.app"
 ];
 
-/* ===================== MIDDLEWARE ===================== */
 app.use(express.json());
 
 app.use(
@@ -42,8 +39,6 @@ app.use(
   })
 );
 
-/* ===================== STATIC FILES ===================== */
-// Ensure uploads folder exists
 const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -51,7 +46,6 @@ if (!fs.existsSync(uploadDir)) {
 
 app.use("/uploads", express.static(uploadDir));
 
-/* ===================== ROUTES ===================== */
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/messages", messageRoutes);
@@ -61,7 +55,6 @@ app.get("/", (req, res) => {
   res.send("Chat API is running successfully");
 });
 
-/* ===================== SOCKET.IO ===================== */
 const io = new Server(server, {
   cors: {
     origin: CLIENT_URLS,
@@ -72,7 +65,6 @@ const io = new Server(server, {
 
 socketHandler(io);
 
-/* ===================== DATABASE ===================== */
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {

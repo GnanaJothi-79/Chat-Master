@@ -19,11 +19,9 @@ export default function Signup() {
         { withCredentials: true }
       );
 
-      // ✅ Auto-login user
-      login(res.data); // store token & user in AuthContext
-      connectSocket(); // connect socket
-      navigate("/chat"); // go to chat page
-
+      login(res.data); 
+      connectSocket();
+      navigate("/chat"); 
     } catch (err) {
       alert(err.response?.data?.message || "Signup failed");
     }

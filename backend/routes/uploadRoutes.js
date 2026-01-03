@@ -8,25 +8,22 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Ensure 'uploads' folder exists
 const uploadDir = path.join(__dirname, "../uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Multer storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadDir); // Save files in 'uploads' folder
+    cb(null, uploadDir); 
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Unique filename
+    cb(null, Date.now() + path.extname(file.originalname)); 
   },
 });
 
 const upload = multer({ storage });
 
-// Upload route
 router.post(
   "/image",
   authMiddleware,

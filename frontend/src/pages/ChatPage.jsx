@@ -12,21 +12,18 @@ const ChatPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 🔐 If not logged in → go to login page
     if (!user) {
       navigate("/login", { replace: true });
       return;
     }
-
-    // 🔌 Connect socket once user exists
     connectSocket();
   }, [user, navigate]);
 
-  if (!user) return null; // prevents UI flicker
+  if (!user) return null; 
 
   return (
     <div className="h-screen flex bg-green-50 overflow-hidden">
-      {/* CHAT LIST */}
+    
       <div
         className={`flex flex-col h-full w-full md:w-1/3 border-r border-emerald-200
           ${selectedUser ? "hidden md:flex" : "flex"}`}
@@ -35,7 +32,6 @@ const ChatPage = () => {
         <ChatList setSelectedUser={setSelectedUser} />
       </div>
 
-      {/* CHAT WINDOW */}
       <div
         className={`flex flex-col flex-1 h-full
           ${selectedUser ? "flex" : "hidden md:flex"}`}

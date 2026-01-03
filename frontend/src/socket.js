@@ -1,4 +1,3 @@
-// frontend/src/socket.js
 import { io } from "socket.io-client";
 
 let socket;
@@ -8,8 +7,8 @@ export const connectSocket = () => {
   if (!token) return;
 
   socket = io(import.meta.env.VITE_SOCKET_URL, {
-    auth: { token }, // 🔑 send token for auth
-    transports: ["websocket"], // optional
+    auth: { token },
+    transports: ["websocket"], 
   });
 
   socket.on("connect", () => {

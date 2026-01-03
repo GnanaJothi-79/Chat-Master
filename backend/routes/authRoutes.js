@@ -5,11 +5,9 @@ const User = require("../models/User");
 
 const router = express.Router();
 
-// ===== SIGNUP =====
 router.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
     if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -20,7 +18,6 @@ router.post("/signup", async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const newUser = await User.create({
       username,
       email,
@@ -46,7 +43,6 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// ===== LOGIN =====
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;

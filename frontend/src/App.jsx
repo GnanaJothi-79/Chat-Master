@@ -12,13 +12,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Auth Page */}
         <Route
           path="/"
           element={user ? <Navigate to="/chat" replace /> : <AuthPage />}
         />
-
-        {/* Chat Page (Protected) */}
         <Route
           path="/chat"
           element={
@@ -27,8 +24,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
