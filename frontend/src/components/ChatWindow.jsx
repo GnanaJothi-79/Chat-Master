@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import axios from "../api/axios";
 import socket from "../socket";
 import { Trash2, Send, Image as ImageIcon } from "lucide-react";
 const API_URL = import.meta.env.VITE_API_URL;

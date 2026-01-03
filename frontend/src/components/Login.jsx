@@ -25,8 +25,8 @@ export default function Login() {
       // 🔐 store user + token
       login(res.data);
 
-      // 🔌 connect socket
-      connectSocket();
+      // // 🔌 connect socket
+      // connectSocket();
 
       // 🔁 navigate to chat page
       navigate("/chat");

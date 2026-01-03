@@ -17,8 +17,7 @@ const server = http.createServer(app);
 
 /* ===================== CONFIG ===================== */
 const PORT = process.env.PORT || 5000;
-const CLIENT_URL =
-  process.env.CLIENT_URL;
+const CLIENT_URL = process.env.CLIENT_URL || "https://chat-master-six.vercel.app";
 
 /* ===================== MIDDLEWARE ===================== */
 app.use(express.json());
