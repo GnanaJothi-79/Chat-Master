@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import socket from "../socket";
 import { Trash2, Send, Image as ImageIcon } from "lucide-react";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -29,7 +29,7 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
 
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/messages/${selectedUser._id}`,
+          `${API_URL}/api/messages/${selectedUser._id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMessages(res.data); // Only messages between currentUser ↔ selectedUser

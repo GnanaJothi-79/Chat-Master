@@ -3,7 +3,7 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { connectSocket } from "../socket"; // make sure you export connectSocket in socket.js
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function Login() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password,
       });

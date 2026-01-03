@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import socket from "../socket";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const ChatList = ({ setSelectedUser }) => {
   const [users, setUsers] = useState([]);
 
@@ -14,7 +14,7 @@ const ChatList = ({ setSelectedUser }) => {
         return;
       }
       try {
-        const res = await axios.get("http://localhost:5000/api/users", {
+        const res = await axios.get(`${API_URL}/api/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUsers(res.data);
