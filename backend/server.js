@@ -30,6 +30,10 @@ app.use(
   })
 );
 
+app.get("/", (req, res) => {
+  res.send("Chat API is running successfully");
+});
+
 /* ===================== STATIC FILES ===================== */
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
