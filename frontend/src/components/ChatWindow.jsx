@@ -60,38 +60,50 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
   }, [selectedUser, currentUserId]);
 
   // Send message (text + optional image)
-  const sendMessage = async () => {
-    if (!text && !selectedImage) return;
+  // Send message (text + optional image)
+const sendMessage = async () => {
+  if (!text && !selectedImage) return;
 
-    let imageUrl = null;
-    if (selectedImage) {
-      const formData = new FormData();
-      formData.append("image", selectedImage);
+  let imageUrl = null;
 
-      try {
-        const res = await axios.post(
-          `${API_URL}/api/upload/image`,
-          formData
-        );
-        imageUrl = API_URL + res.data.imageUrl;
-      } catch (err) {
-        console.error("Image upload failed:", err);
-      }
+  if (selectedImage) {
+    const formData = new FormData();
+    formData.append("image", selectedImage);
+
+    try {
+      const token = localStorage.getItem("token"); // get auth token
+
+      const res = await axios.post(`${API_URL}/api/upload/image`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`, // send token if required
+        },
+      });
+
+      // res.data.imageUrl should be like /uploads/filename.png
+      imageUrl = `${API_URL}${res.data.imageUrl}`;
+    } catch (err) {
+      console.error("Image upload failed:", err);
     }
+  }
 
-    const msg = {
-      senderId: currentUserId,
-      receiverId: selectedUser._id,
-      message: text,
-      image: imageUrl,
-      createdAt: new Date(),
-    };
-
-    socket.emit("sendMessage", msg);
-
-    setText("");
-    setSelectedImage(null);
+  // Prepare message object
+  const msg = {
+    senderId: currentUserId,
+    receiverId: selectedUser._id,
+    message: text || null,
+    image: imageUrl,
+    createdAt: new Date(),
   };
+
+  // Emit message to socket
+  socket.emit("sendMessage", msg);
+
+  // Clear input
+  setText("");
+  setSelectedImage(null);
+};
+
 
   // Delete a message
   const deleteMessage = async (id) => {

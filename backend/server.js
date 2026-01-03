@@ -4,6 +4,7 @@ const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
+const fs = require("fs");
 require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
@@ -17,24 +18,38 @@ const server = http.createServer(app);
 
 /* ===================== CONFIG ===================== */
 const PORT = process.env.PORT || 5000;
-const CLIENT_URL = process.env.CLIENT_URL || "https://chat-master-six.vercel.app";
+
+// Allow multiple frontends
+const CLIENT_URLS = [
+  "http://localhost:5173",
+  "https://chat-master-six.vercel.app",
+  "https://chat-master-git-main-gnana-jothis-projects.vercel.app"
+];
 
 /* ===================== MIDDLEWARE ===================== */
 app.use(express.json());
 
 app.use(
   cors({
-    origin: CLIENT_URL,
+    origin: (origin, callback) => {
+      if (!origin || CLIENT_URLS.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
 
-app.get("/", (req, res) => {
-  res.send("Chat API is running successfully");
-});
-
 /* ===================== STATIC FILES ===================== */
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Ensure uploads folder exists
+const uploadDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+app.use("/uploads", express.static(uploadDir));
 
 /* ===================== ROUTES ===================== */
 app.use("/api/auth", authRoutes);
@@ -42,10 +57,14 @@ app.use("/api/users", userRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/upload", uploadRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Chat API is running successfully");
+});
+
 /* ===================== SOCKET.IO ===================== */
 const io = new Server(server, {
   cors: {
-    origin: CLIENT_URL,
+    origin: CLIENT_URLS,
     methods: ["GET", "POST"],
     credentials: true,
   },
