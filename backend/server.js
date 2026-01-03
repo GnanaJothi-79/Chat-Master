@@ -18,7 +18,7 @@ const server = http.createServer(app);
 /* ===================== CONFIG ===================== */
 const PORT = process.env.PORT || 5000;
 const CLIENT_URL =
-  process.env.CLIENT_URL || "http://localhost:5173";
+  process.env.CLIENT_URL;
 
 /* ===================== MIDDLEWARE ===================== */
 app.use(express.json());
