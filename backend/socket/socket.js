@@ -64,14 +64,14 @@ const socketHandler = (io) => {
     });
 
     socket.on("deleteMessage", async ({ msgId, receiverId }) => {
-  try {
-    await Message.findByIdAndDelete(msgId);
-    io.to(receiverId).emit("messageDeleted", msgId);
-    io.to(socket.userId).emit("messageDeleted", msgId);
-  } catch (err) {
-    console.log("❌ Delete msg error:", err.message);
-  }
-});
+      try {
+        await Message.findByIdAndDelete(msgId);
+        io.to(receiverId).emit("messageDeleted", msgId);
+        io.to(socket.userId).emit("messageDeleted", msgId);
+      } catch (err) {
+        console.log("❌ Delete msg error:", err.message);
+      }
+    });
 
 
     // 🔴 DISCONNECT
