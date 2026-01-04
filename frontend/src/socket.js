@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-let socket;
+let socket = null;
 
 export const connectSocket = () => {
   const token = localStorage.getItem("token");
@@ -8,7 +8,7 @@ export const connectSocket = () => {
 
   socket = io(import.meta.env.VITE_SOCKET_URL, {
     auth: { token },
-    transports: ["websocket"], 
+    transports: ["websocket"],
   });
 
   socket.on("connect", () => {

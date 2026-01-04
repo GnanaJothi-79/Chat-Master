@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { getSocket } from "../socket";
+
 const API_URL = import.meta.env.VITE_API_URL;
 const ChatList = ({ setSelectedUser }) => {
   const [users, setUsers] = useState([]);
@@ -26,13 +27,18 @@ const ChatList = ({ setSelectedUser }) => {
   }, []);
 
   useEffect(() => {
-    socket.on("userStatus", ({ userId, isOnline }) => {
-      setUsers((prev) =>
-        prev.map((u) => (u._id === userId ? { ...u, isOnline } : u))
-      );
-    });
-    return () => socket.off("userStatus");
-  }, []);
+  const socket = getSocket();
+  if (!socket) return;
+
+  socket.on("userStatus", ({ userId, isOnline }) => {
+    setUsers((prev) =>
+      prev.map((u) => (u._id === userId ? { ...u, isOnline } : u))
+    );
+  });
+
+  return () => socket.off("userStatus");
+}, []);
+
 
   return (
     <div className="p-4 flex-1 overflow-y-auto bg-green-100">
