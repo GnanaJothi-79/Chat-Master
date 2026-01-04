@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import socket from "../socket";
+import { getSocket } from "../socket";
 const API_URL = import.meta.env.VITE_API_URL;
 const ChatList = ({ setSelectedUser }) => {
   const [users, setUsers] = useState([]);
