@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "../api/axios";
-import socket from "../socket";
+import { getSocket } from "../socket";
+
 import { Trash2, Send, Image as ImageIcon } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -39,6 +40,8 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
 
   useEffect(() => {
     if (!selectedUser) return;
+    const socket = getSocket();
+    if (!socket) return;
     const handleMessage = (msg) => {
       const isCurrentChat =
         (msg.senderId === currentUserId && msg.receiverId === selectedUser._id) ||
@@ -54,6 +57,8 @@ const ChatWindow = ({ selectedUser, currentUserId, onBack }) => {
 
   const sendMessage = async () => {
     if (!text && !selectedImage) return;
+     const socket = getSocket();
+     if (!socket) return;
     let imageUrl = null;
     if (selectedImage) {
       const formData = new FormData();
