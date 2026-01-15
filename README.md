@@ -1,3 +1,16 @@
+Company: Codetech IT Solutions
+
+Intern: Gnana Jothi G   
+Intern ID: CTIS0336   
+Domain: Frontend Development   
+Duration: 4 Weeks   
+Mentor: Neela Santhosh  
+
+<img width="1898" height="866" alt="Image" src="image 1.jpg" />
+<img width="1898" height="866" alt="Image" src="image 2.jpg" />
+<img width="1898" height="866" alt="Image" src="image 3.jpg" />
+
+
 # 💬 MERN Real-Time Chat Application
 
 A full-stack real-time chat application built using **MongoDB, Express, React, Node.js, and Socket.IO**.  
