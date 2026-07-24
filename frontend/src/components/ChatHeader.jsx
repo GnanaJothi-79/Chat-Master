@@ -7,10 +7,10 @@ const ChatHeader = ({ showLogout = true }) => {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
-    disconnectSocket();
-    localStorage.clear();
-    navigate("/");
+    logout();
   };
+
+  if (!user) return null;
 
   return (
     <div className="flex items-center justify-between p-9 pl-5 pr-5 border-b bg-emerald-950">
