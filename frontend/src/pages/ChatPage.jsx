@@ -12,12 +12,10 @@ const ChatPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
-      navigate("/login", { replace: true });
-      return;
-    }
+  if (user) {
     connectSocket();
-  }, [user, navigate]);
+  }
+}, [user]);
 
   if (!user) return null; 
 
