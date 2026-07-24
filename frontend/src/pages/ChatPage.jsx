@@ -9,13 +9,7 @@ import ChatWindow from "../components/ChatWindow";
 const ChatPage = () => {
   const { user } = useContext(AuthContext);
   const [selectedUser, setSelectedUser] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-  if (user) {
-    connectSocket();
-  }
-}, [user]);
+  
 
   if (!user) return null; 
 
